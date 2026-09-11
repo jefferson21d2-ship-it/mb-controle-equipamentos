@@ -106,6 +106,9 @@ export const QRScannerModal: React.FC = () => {
     setCameraError(null);
 
     try {
+      if (!window.isSecureContext || !navigator.mediaDevices?.getUserMedia) {
+        throw new Error('SECURE_CONTEXT_UNAVAILABLE');
+      }
       const constraints: MediaStreamConstraints = {
         video: {
           facingMode: facing,
@@ -136,9 +139,12 @@ export const QRScannerModal: React.FC = () => {
       startScanLoop();
     } catch (err: any) {
       console.warn('Câmera indisponível ou acesso não concedido:', err);
-      setCameraError(
-        'Câmera indisponível no navegador. Você pode digitar o código patrimonial manualmente abaixo.'
-      );
+      const message = err?.name === 'NotAllowedError'
+        ? 'Permissão da câmera negada. Autorize a câmera nas permissões do navegador ou do aplicativo Android e tente novamente.'
+        : err?.message === 'SECURE_CONTEXT_UNAVAILABLE'
+        ? 'A câmera só funciona em HTTPS ou no aplicativo Android instalado. Abra o endereço oficial ou use o APK atualizado.'
+        : 'Não foi possível abrir a câmera. Verifique se outro aplicativo está usando-a e tente novamente.';
+      setCameraError(`${message} Você também pode digitar o código patrimonial manualmente abaixo.`);
       setCameraActive(false);
       isScanningActiveRef.current = false;
     }
