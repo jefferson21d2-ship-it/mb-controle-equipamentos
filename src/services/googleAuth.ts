@@ -13,6 +13,7 @@ const STORAGE_KEY_AUTH = 'mb_local_session_v3';
 const STORAGE_KEY_CREDENTIALS = 'mb_local_credentials_v1';
 const SESSION_DURATION_MS = 12 * 60 * 60 * 1000;
 const configuredUsername = (import.meta.env.VITE_ADMIN_USERNAME || 'admin').trim();
+const LOCAL_ADMIN_EMAIL = 'jefferson21D2@gmail.com';
 
 export type AuthStatus =
   | 'AUTHORIZED'
@@ -60,7 +61,16 @@ export class GoogleAuthService {
         return null;
       }
       const cachedUser = localStorage.getItem(`${STORAGE_KEY_AUTH}:user`);
-      return cachedUser ? (JSON.parse(cachedUser) as Usuario) : null;
+      if (!cachedUser) return null;
+      const user = JSON.parse(cachedUser) as Usuario;
+      // Migra sessões criadas pela primeira versão, que usava um e-mail técnico
+      // diferente do administrador existente na base local.
+      if (normalize(user.email) === 'admin@mb.local') {
+        const migratedUser = { ...user, email: LOCAL_ADMIN_EMAIL };
+        localStorage.setItem(`${STORAGE_KEY_AUTH}:user`, JSON.stringify(migratedUser));
+        return migratedUser;
+      }
+      return user;
     } catch (error) {
       console.warn('Sessão local inválida; iniciando sessão limpa.', error);
       this.logout();
@@ -94,7 +104,9 @@ export class GoogleAuthService {
     }
 
     const matched = usuariosCadastrados.find(
-      (user) => normalize(user.email) === normalize(email),
+      (user) =>
+        normalize(user.email) === normalize(email) ||
+        (normalize(email) === 'admin@mb.local' && user.perfil === 'Administrador' && user.ativo),
     );
 
     if (!matched) {
