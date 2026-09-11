@@ -134,15 +134,8 @@ export const QRScannerModal: React.FC = () => {
         setHasTorch(Boolean(capabilities.torch));
       }
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute('playsinline', 'true');
-        await videoRef.current.play();
-      }
-
       setCameraActive(true);
       isScanningActiveRef.current = true;
-      startScanLoop();
     } catch (err: any) {
       console.warn('Câmera indisponível ou acesso não concedido:', err);
       const message = err?.name === 'NotAllowedError'
@@ -155,6 +148,24 @@ export const QRScannerModal: React.FC = () => {
       isScanningActiveRef.current = false;
     }
   };
+
+  // O elemento <video> só é montado quando cameraActive fica true.
+  // Anexa o stream depois da montagem para evitar visor parado no Android/WebView.
+  useEffect(() => {
+    const attachStream = async () => {
+      if (!cameraActive || !streamRef.current || !videoRef.current) return;
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.setAttribute('playsinline', 'true');
+      try {
+        await videoRef.current.play();
+        if (isScanningActiveRef.current) startScanLoop();
+      } catch (error) {
+        console.warn('Não foi possível iniciar a reprodução da câmera:', error);
+        setCameraError('A câmera foi autorizada, mas não iniciou a reprodução. Toque em “Ativar Câmera” novamente.');
+      }
+    };
+    attachStream();
+  }, [cameraActive]);
 
   // Parar Câmera
   const stopCamera = () => {
