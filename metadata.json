@@ -1,0 +1,6 @@
+{
+  "name": "M&B Controle de Equipamentos",
+  "description": "Sistema profissional para controle de equipamentos de topografia, GNSS, drones e acessórios integrado com Google Sheets.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

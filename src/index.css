@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Ocultar navegação, cabeçalhos do app e botões na impressão */
+  header, nav, aside, .print\:hidden {
+    display: none !important;
+  }
+
+  @page {
+    margin: 8mm;
+    size: auto;
+  }
+}

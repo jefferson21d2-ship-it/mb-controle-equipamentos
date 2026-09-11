@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">M&amp;B Controle de Equipamentos</string>
+    <string name="title_activity_main">M&amp;B Controle de Equipamentos</string>
+    <string name="package_name">br.com.mbtopografia.controleequipamentos</string>
+    <string name="custom_url_scheme">br.com.mbtopografia.controleequipamentos</string>
+</resources>
