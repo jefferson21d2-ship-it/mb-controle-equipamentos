@@ -1,0 +1,45 @@
+name: Gerar APK Android
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Sincronizar projeto Capacitor
+        run: npm run android:sync
+
+      - name: Gerar APK de teste
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Disponibilizar APK para download
+        uses: actions/upload-artifact@v4
+        with:
+          name: mb-controle-equipamentos-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 30
