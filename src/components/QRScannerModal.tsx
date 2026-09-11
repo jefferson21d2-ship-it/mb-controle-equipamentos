@@ -83,12 +83,17 @@ export const QRScannerModal: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const scanLoopRef = useRef<number | null>(null);
   const isScanningActiveRef = useRef<boolean>(false);
+  const cameraStartTimerRef = useRef<number | null>(null);
 
   // Inicializar / Finalizar modal
   useEffect(() => {
     if (qrScannerOpen) {
-      startCamera(facingMode);
+      // Aguarda o modal montar o elemento <video> antes de anexar o stream.
+      cameraStartTimerRef.current = window.setTimeout(() => {
+        startCamera(facingMode);
+      }, 120);
     } else {
+      if (cameraStartTimerRef.current) window.clearTimeout(cameraStartTimerRef.current);
       stopCamera();
       setSelectedEquipamento(null);
       setScanStatus(null);
@@ -96,6 +101,7 @@ export const QRScannerModal: React.FC = () => {
       setLastScannedCode('');
     }
     return () => {
+      if (cameraStartTimerRef.current) window.clearTimeout(cameraStartTimerRef.current);
       stopCamera();
     };
   }, [qrScannerOpen]);
