@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AlertCircle, Compass, Eye, EyeOff, KeyRound, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff, KeyRound, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { GoogleAuthService } from '../services/googleAuth';
-import { Usuario } from '../types';
+import { INITIAL_DATABASE } from '../data/initialDatabase';
 
 interface AcessoBloqueadoViewProps {
   motivo?: string;
@@ -26,16 +26,7 @@ export const AcessoBloqueadoView: React.FC<AcessoBloqueadoViewProps> = ({ motivo
       setError('As senhas não conferem.');
       return;
     }
-    const usuarios: Usuario[] = [
-      {
-        id: 'usr-admin-jefferson',
-        nome: 'Administrador M&B',
-        email: 'jefferson21D2@gmail.com',
-        cargo: 'Administrador',
-        perfil: 'Administrador',
-        ativo: true,
-      },
-    ];
+    const usuarios = INITIAL_DATABASE.usuarios;
     const result = isSetup
       ? await GoogleAuthService.setupCredentials(username, password, usuarios)
       : await GoogleAuthService.authenticate(username, password, usuarios);
@@ -51,8 +42,12 @@ export const AcessoBloqueadoView: React.FC<AcessoBloqueadoViewProps> = ({ motivo
     <main className="min-h-screen bg-slate-950 text-slate-100 flex items-center justify-center p-4 font-sans">
       <section className="w-full max-w-md space-y-5">
         <div className="text-center space-y-3">
-          <div className="mx-auto w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-xl shadow-blue-950/40">
-            <Compass className="w-9 h-9 text-white" />
+          <div className="mx-auto w-20 h-20 rounded-2xl bg-white/95 border border-slate-700 p-2 flex items-center justify-center shadow-xl shadow-blue-950/40">
+            <img
+              src={`${import.meta.env.BASE_URL}mb-logo.png`}
+              alt="Mendes & Borges Engenharia"
+              className="h-full w-full object-contain"
+            />
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">M&B Controle de Equipamentos</h1>
