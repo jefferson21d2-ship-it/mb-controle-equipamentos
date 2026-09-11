@@ -30,7 +30,7 @@ export const AcessoBloqueadoView: React.FC<AcessoBloqueadoViewProps> = ({ motivo
       {
         id: 'usr-admin-jefferson',
         nome: 'Administrador M&B',
-        email: 'admin@mb.local',
+        email: 'jefferson21D2@gmail.com',
         cargo: 'Administrador',
         perfil: 'Administrador',
         ativo: true,
