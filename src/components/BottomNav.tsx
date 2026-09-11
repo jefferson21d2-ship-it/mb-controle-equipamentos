@@ -90,7 +90,7 @@ export const BottomNav: React.FC = () => {
 
       {/* Mobile Sticky Bottom Bar (Thumb-optimized for Android / iPhone) */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur border-t border-slate-800 pb-safe">
-        <div className="flex items-center justify-around px-1 py-1 max-w-lg mx-auto">
+        <div className="grid grid-cols-6 items-stretch px-1 py-1 max-w-lg mx-auto">
           {navItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
             const isActive = activeView === item.id;
@@ -98,7 +98,7 @@ export const BottomNav: React.FC = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveView(item.id)}
-                className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all relative ${
+                className={`flex min-w-0 flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all relative ${
                   isActive ? 'text-blue-400 font-bold' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
@@ -110,7 +110,7 @@ export const BottomNav: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <span className="text-[10px] tracking-tight mt-0.5">{item.shortLabel}</span>
+                <span className="block max-w-full truncate text-[10px] leading-3 tracking-tight mt-1">{item.shortLabel}</span>
               </button>
             );
           })}
@@ -123,7 +123,7 @@ export const BottomNav: React.FC = () => {
               else if (activeView === 'historico') setActiveView('configuracao');
               else setActiveView('kits');
             }}
-            className={`flex flex-col items-center justify-center flex-1 py-1 px-1 rounded-xl transition-all relative ${
+            className={`flex min-w-0 flex-col items-center justify-center py-1.5 px-0.5 rounded-xl transition-all relative ${
               activeView === 'kits' || activeView === 'manutencao' || activeView === 'historico' || activeView === 'configuracao'
                 ? 'text-blue-400 font-bold'
                 : 'text-slate-400 hover:text-slate-200'
@@ -137,7 +137,7 @@ export const BottomNav: React.FC = () => {
                 </span>
               )}
             </div>
-            <span className="text-[10px] tracking-tight mt-0.5">
+            <span className="block max-w-full truncate text-[10px] leading-3 tracking-tight mt-1">
               {activeView === 'kits'
                 ? 'Kits'
                 : activeView === 'manutencao'

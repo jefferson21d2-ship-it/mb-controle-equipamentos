@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+.pb-safe {
+  padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+}
+
 @media print {
   body {
     background-color: #ffffff !important;

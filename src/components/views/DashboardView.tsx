@@ -160,18 +160,27 @@ export const DashboardView: React.FC = () => {
     <div className="space-y-6 pb-20 lg:pb-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       {/* Top Header & Contexto Operacional */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-800 pb-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white tracking-tight">
+        <div className="flex min-w-0 items-start gap-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-2xl bg-white/95 border border-slate-700 p-1.5 shadow-lg shadow-blue-950/20">
+            <img
+              src={`${import.meta.env.BASE_URL}mb-logo.png`}
+              alt="Mendes & Borges Engenharia"
+              className="h-full w-full object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h1 className="min-w-0 text-lg sm:text-xl font-bold text-white tracking-tight break-words">
               M&B Controle de Equipamentos
             </h1>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800">
+            <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800">
               Palmas - TO
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
             Painel operacional de rastreabilidade de drones, GNSS, estações e acessórios de topografia.
           </p>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">

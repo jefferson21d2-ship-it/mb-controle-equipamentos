@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Compass,
   QrCode,
   RefreshCw,
   Sheet,
@@ -49,28 +48,32 @@ export const Navbar: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 bg-slate-900/95 backdrop-blur border-b border-slate-800 text-slate-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex min-h-16 items-center justify-between gap-2 py-2">
           {/* Logo e Nome Corporativo */}
           <div
             onClick={() => setActiveView('dashboard')}
-            className="flex items-center gap-3 cursor-pointer select-none"
+            className="flex min-w-0 flex-1 items-center gap-2 cursor-pointer select-none"
           >
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
-              <Compass className="w-6 h-6 stroke-[2.2]" />
+            <div className="w-9 h-9 sm:w-11 sm:h-11 shrink-0 rounded-xl bg-white/95 border border-slate-700 flex items-center justify-center p-1 shadow-md shadow-blue-500/10">
+              <img
+                src={`${import.meta.env.BASE_URL}mb-logo.png`}
+                alt="Mendes & Borges Engenharia"
+                className="h-full w-full object-contain"
+              />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold tracking-tight text-lg text-white">M&B</span>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-blue-950 text-blue-400 font-semibold border border-blue-800/50">
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <span className="font-bold tracking-tight text-sm sm:text-lg text-white whitespace-nowrap">M&B</span>
+                <span className="hidden md:inline text-xs px-2 py-0.5 rounded-full bg-blue-950 text-blue-400 font-semibold border border-blue-800/50 truncate">
                   TOPOGRAFIA & DRONES
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium">Controle de Equipamentos</p>
+              <p className="hidden sm:block text-xs text-slate-400 font-medium truncate">Controle de Equipamentos</p>
             </div>
           </div>
 
           {/* Ações de Topo */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             {/* Status do Google Sheets */}
             <button
               onClick={() => setConnectionModalOpen(true)}
@@ -108,13 +111,15 @@ export const Navbar: React.FC = () => {
               </button>
             )}
 
-            {/* Botão de Instalação PWA */}
-            <PWAInstallButton />
+            {/* Botão de Instalação PWA: no celular, o Chrome também oferece a instalação pelo menu. */}
+            <div className="hidden sm:block">
+              <PWAInstallButton />
+            </div>
 
             {/* Leitor de QR Code */}
             <button
               onClick={() => openQrScanner({ mode: 'lookup' })}
-              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all"
+              className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white px-2 sm:px-3 py-1.5 rounded-lg text-xs font-semibold shadow-sm transition-all"
             >
               <QrCode className="w-4 h-4" />
               <span className="hidden md:inline">Ler QR Code</span>
@@ -122,10 +127,10 @@ export const Navbar: React.FC = () => {
             </button>
 
             {/* Perfil Google Workspace com Dropdown de Governança / RBAC */}
-            <div className="relative" ref={dropdownRef}>
+            <div className="relative shrink-0" ref={dropdownRef}>
               <button
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center gap-2 pl-2 border-l border-slate-800 text-xs hover:bg-slate-800/60 p-1.5 rounded-xl transition-colors"
+                className="flex items-center gap-1 sm:gap-2 sm:pl-2 border-l border-slate-800 text-xs hover:bg-slate-800/60 p-1.5 rounded-xl transition-colors"
                 title="Perfil Google Workspace Conectado"
               >
                 <div

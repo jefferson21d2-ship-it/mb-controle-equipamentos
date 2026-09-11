@@ -28,7 +28,7 @@ const MainLayout: React.FC = () => {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white font-sans antialiased">
       <Navbar />
       <BottomNav />
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full min-w-0 overflow-x-hidden pb-24 lg:pb-0">
         {activeView === 'dashboard' && <DashboardView />}
         {activeView === 'equipamentos' && <EquipamentosView />}
         {activeView === 'nova-saida' && <NovaSaidaView />}
