@@ -13,9 +13,12 @@ import {
   Trash2,
   HardHat,
   ExternalLink,
+  Plus,
+  Building2,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { GOOGLE_APPS_SCRIPT_CODE } from '../../services/appsScriptTemplate';
+import { Obra } from '../../types';
 
 export const ConfiguracaoView: React.FC = () => {
   const {
@@ -31,12 +34,15 @@ export const ConfiguracaoView: React.FC = () => {
     setCurrentUser,
     db,
     setConnectionModalOpen,
+    salvarObra,
+    permissions,
   } = useApp();
 
   const [appsScriptUrl, setAppsScriptUrl] = useState(config.appsScriptUrl || '');
   const [spreadsheetId, setSpreadsheetId] = useState(config.spreadsheetId || '');
   const [copiedCode, setCopiedCode] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [obraForm, setObraForm] = useState<Obra>({ id: '', codigo: '', nome: '', cliente: '', localizacao: '', cidade: '', uf: '', status: 'Ativa' });
 
   const handleSaveAndSync = async () => {
     saveConfig({
@@ -58,6 +64,13 @@ export const ConfiguracaoView: React.FC = () => {
     setTimeout(() => setCopiedCode(false), 3000);
   };
 
+  const handleSaveObra = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!obraForm.codigo.trim() || !obraForm.nome.trim()) return;
+    await salvarObra({ ...obraForm, id: obraForm.id || crypto.randomUUID(), codigo: obraForm.codigo.trim().toUpperCase(), nome: obraForm.nome.trim() });
+    setObraForm({ id: '', codigo: '', nome: '', cliente: '', localizacao: '', cidade: '', uf: '', status: 'Ativa' });
+  };
+
   return (
     <div className="space-y-6 pb-20 lg:pb-12 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
       {/* Header */}
@@ -71,6 +84,18 @@ export const ConfiguracaoView: React.FC = () => {
             Gerenciamento do banco Google Sheets, API Google Apps Script e autenticação Google Workspace.
           </p>
         </div>
+      </div>
+
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3"><div className="w-10 h-10 rounded-xl bg-blue-950 border border-blue-800 text-blue-300 flex items-center justify-center"><Building2 className="w-5 h-5" /></div><div><h2 className="text-sm font-bold text-white">Obras e Serviços</h2><p className="text-xs text-slate-400">Cadastre cada novo serviço de topografia antes de registrar a saída.</p></div></div>
+          <span className="text-xs text-slate-400">{db.obras.length} cadastrados</span>
+        </div>
+        {permissions.canAdministrarObras && <form onSubmit={handleSaveObra} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {([['codigo','Código *'],['nome','Nome do serviço *'],['cliente','Cliente'],['localizacao','Localização']] as const).map(([key,label]) => <input key={key} value={obraForm[key] || ''} onChange={e=>setObraForm({...obraForm,[key]:e.target.value})} placeholder={label} required={key==='codigo'||key==='nome'} className="w-full rounded-xl bg-slate-950 border border-slate-700 px-3 py-2.5 text-xs text-white outline-none focus:border-blue-500" />)}
+          <button className="sm:col-span-2 lg:col-span-4 w-full sm:w-auto sm:justify-self-end bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl inline-flex items-center justify-center gap-2"><Plus className="w-4 h-4" /> Cadastrar obra/serviço</button>
+        </form>}
+        <div className="space-y-2">{db.obras.map(obra=><div key={obra.id} className="flex items-center justify-between gap-3 rounded-xl bg-slate-950/70 border border-slate-800 px-3 py-2.5"><div className="min-w-0"><span className="text-[10px] font-mono text-blue-400 mr-2">{obra.codigo}</span><span className="text-xs font-semibold text-white">{obra.nome}</span><p className="text-[11px] text-slate-500 truncate">{obra.cliente || 'Cliente não informado'} {obra.localizacao ? `• ${obra.localizacao}` : ''}</p></div><span className="text-[10px] text-emerald-400">{obra.status}</span></div>)}</div>
       </div>
 
       {/* Card: Status da Conexão */}

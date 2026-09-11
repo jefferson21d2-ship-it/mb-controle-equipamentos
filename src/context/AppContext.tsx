@@ -131,6 +131,7 @@ interface AppContextType {
   loginWithGoogleEmail: (email: string) => Promise<boolean>;
   logout: () => void;
   salvarUsuario: (usuario: Usuario) => Promise<void>;
+  salvarObra: (obra: Obra) => Promise<void>;
   alternarStatusUsuario: (usuarioId: string) => Promise<void>;
   cadastrarEquipamento: (novo: Omit<Equipamento, 'id'>) => Promise<Equipamento>;
   editarEquipamento: (id: string, atualizacao: Partial<Equipamento>) => Promise<Equipamento>;
@@ -1309,6 +1310,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const salvarObra = async (obra: Obra): Promise<void> => {
+    if (!permissions.canAdministrarObras) throw new Error('Acesso negado: somente Administradores podem administrar obras.');
+    const existe = db.obras.some((item) => item.id === obra.id);
+    const updatedObras = existe ? db.obras.map((item) => item.id === obra.id ? obra : item) : [...db.obras, obra];
+    const updatedDb = { ...db, obras: updatedObras };
+    setDb(updatedDb);
+    GoogleSheetsService.saveLocalDatabase(updatedDb);
+    if (config.appsScriptUrl) {
+      GoogleSheetsService.sendUpdateToAppsScript(config.appsScriptUrl, existe ? 'update' : 'insert', {
+        table: 'OBRAS', keyField: 'ID', keyValue: obra.id, data: obra,
+      }).catch(console.error);
+    }
+  };
+
   const alternarStatusUsuario = async (usuarioId: string): Promise<void> => {
     if (!permissions.canAdministrarUsuarios) {
       throw new Error('Acesso negado: Apenas Administradores podem alterar o status de usuários.');
@@ -1590,6 +1605,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         loginWithGoogleEmail,
         logout,
         salvarUsuario,
+        salvarObra,
         alternarStatusUsuario,
         cadastrarEquipamento,
         editarEquipamento,
