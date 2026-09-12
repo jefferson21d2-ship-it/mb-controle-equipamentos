@@ -23,9 +23,10 @@ import {
   Search,
   Volume2,
   X,
+  PlusCircle,
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
-import { Equipamento, Kit, KitRequisito, Saida } from '../../types';
+import { Equipamento, Kit, KitRequisito, Saida, Obra } from '../../types';
 import {
   calculateKitChecklistSummary,
   getEquipamentoTipoChecklist,
@@ -45,6 +46,7 @@ export const NovaSaidaView: React.FC = () => {
     openQrScanner,
     setActiveView,
     currentUser,
+    salvarObra,
   } = useApp();
 
   // Etapas do Fluxo:
@@ -56,7 +58,8 @@ export const NovaSaidaView: React.FC = () => {
   // Formulário Inicial
   const [selectedObraId, setSelectedObraId] = useState<string>('');
   const [selectedResponsavelId, setSelectedResponsavelId] = useState<string>('');
-  const [selectedKitId, setSelectedKitId] = useState<string>('kit-matrice-350'); // Padrão: KIT DJI MATRICE 350
+  const [selectedKitIds, setSelectedKitIds] = useState<string[]>(['kit-matrice-350']); // Permite combinar drone, GNSS e acessórios
+  const selectedKitId = selectedKitIds[0] || '';
   const [previsaoDevolucao, setPrevisaoDevolucao] = useState<string>('');
   const [observacoes, setObservacoes] = useState<string>('');
 
@@ -96,9 +99,19 @@ export const NovaSaidaView: React.FC = () => {
       ativo: true,
     };
 
-  const currentKitRequisitos: KitRequisito[] = db.kitRequisitos.filter(
-    (r) => r.kitId === currentKit.id
-  );
+  const currentKitRequisitos: KitRequisito[] = db.kitRequisitos
+    .filter((r) => selectedKitIds.includes(r.kitId))
+    .map((r) => ({ ...r, id: `${r.id}-${r.kitId}` }));
+
+  const handleCadastrarObraRapida = async () => {
+    const nome = window.prompt('Nome do novo serviço/obra de topografia:');
+    if (!nome?.trim()) return;
+    const codigo = window.prompt('Código do serviço (ex.: OBR-2026-001):', `OBR-${new Date().getFullYear()}-${String(db.obras.length + 1).padStart(3, '0')}`);
+    if (!codigo?.trim()) return;
+    const obra: Obra = { id: crypto.randomUUID(), codigo: codigo.trim().toUpperCase(), nome: nome.trim(), status: 'Ativa' };
+    await salvarObra(obra);
+    setSelectedObraId(obra.id);
+  };
 
   // Resumo de Progresso do Checklist
   const summary: KitChecklistSummary = calculateKitChecklistSummary(
@@ -484,6 +497,7 @@ export const NovaSaidaView: React.FC = () => {
                     </option>
                   ))}
                 </select>
+                <button type="button" onClick={handleCadastrarObraRapida} className="mt-2 text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1"><PlusCircle className="w-3.5 h-3.5" /> Cadastrar novo serviço/obra</button>
                 {db.obras.length === 0 && (
                   <p className="text-[11px] text-amber-400 mt-1">
                     Nenhuma obra carregada. Sincronize com o Google Sheets na barra superior.
@@ -548,7 +562,7 @@ export const NovaSaidaView: React.FC = () => {
                   2. Escolha o Kit Operacional
                 </h2>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Selecione o kit que define os requisitos obrigatórios para a conferência.
+                  Selecione um ou mais kits para combinar drone, GNSS e acessórios na mesma saída.
                 </p>
               </div>
               <span className="text-xs font-semibold text-blue-400 bg-blue-950/80 px-2.5 py-1 rounded-lg border border-blue-900">
@@ -560,12 +574,12 @@ export const NovaSaidaView: React.FC = () => {
               {db.kits.map((kit) => {
                 const reqs = db.kitRequisitos.filter((r) => r.kitId === kit.id);
                 const totalItens = reqs.reduce((acc, curr) => acc + curr.quantidade, 0);
-                const isSelected = selectedKitId === kit.id;
+                const isSelected = selectedKitIds.includes(kit.id);
 
                 return (
                   <div
                     key={kit.id}
-                    onClick={() => setSelectedKitId(kit.id)}
+                    onClick={() => setSelectedKitIds((ids) => isSelected ? (ids.length > 1 ? ids.filter((id) => id !== kit.id) : ids) : [...ids, kit.id])}
                     className={`p-4 rounded-2xl border cursor-pointer transition-all ${
                       isSelected
                         ? 'bg-blue-950/60 border-blue-500 ring-2 ring-blue-500/20 shadow-md'
@@ -624,7 +638,7 @@ export const NovaSaidaView: React.FC = () => {
                   <p className="text-xs text-slate-400">Kit pronto para conferência:</p>
                   <p className="text-sm font-bold text-white flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block"></span>
-                    {currentKit.nome}
+                    {selectedKitIds.map((id) => db.kits.find((k) => k.id === id)?.nome).filter(Boolean).join(' + ')}
                   </p>
                   <p className="text-xs text-slate-400 mt-0.5">
                     {currentKitRequisitos.map((r) => `${r.tipoChecklist}: ${r.quantidade}`).join(' • ')}
